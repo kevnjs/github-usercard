@@ -4,8 +4,9 @@ import axios from 'axios';
     (replacing the placeholder with your Github name):
     https://api.github.com/users/<your name>
 */
-axios.get('https://api.github.com/users/kevnjs')
-.then(resp => console.log(resp));
+axios.get('https://api.github.com/users/kevnjs');
+
+
 /*
   STEP 2: Inspect and study the data coming back, this is YOUR
     github info! You will need to understand the structure of this
@@ -18,6 +19,20 @@ axios.get('https://api.github.com/users/kevnjs')
   STEP 4: Pass the data received from Github into your function,
     and append the returned markup to the DOM as a child of .cards
 */
+axios.get('https://api.github.com/users/kevnjs').then(response => {
+  const data = gitHubCard(response);
+  const cards = document.querySelector('.cards');
+  cards.appendChild(data);
+  followersArray.forEach(follower => {
+    axios.get(`https://api.github.com/users/${follower}`).then(response => {
+      const data = gitHubCard(response);
+      const cards = document.querySelector('.cards');
+      cards.appendChild(data);
+      
+    })
+  });
+})
+
 
 /*
   STEP 5: Now that you have your own card getting added to the DOM, either
@@ -30,7 +45,22 @@ axios.get('https://api.github.com/users/kevnjs')
     user, and adding that card to the DOM.
 */
 
-const followersArray = [];
+const followersArray = [
+  'tetondan',
+  'dustinmyers',
+  'justsml',
+  'luishrd',
+  'bigknell'
+];
+
+// followersArray.forEach(follower => {
+//   axios.get(`https://api.github.com/users/${follower}`).then(response => {
+//     const data = gitHubCard(response);
+//     const cards = document.querySelector('.cards');
+//     cards.after(appendChild(data);
+    
+//   })
+// });
 
 /*
   STEP 3: Create a function that accepts a single object as its only argument.
@@ -51,7 +81,7 @@ const followersArray = [];
       </div>
     </div>
 */
-const gitHubData = obj => {
+const gitHubCard = obj => {
   const card = document.createElement('div');
   const image = document.createElement('img');
   const cardInfo = document.createElement('div');
@@ -64,16 +94,27 @@ const gitHubData = obj => {
   const following = document.createElement('p');
   const userBio = document.createElement('p');
 
+  card.classList.add('card');
   cardInfo.classList.add('card-info');
   name.classList.add('name');
   username.classList.add('username');
 
+  image.src = obj.data["avatar_url"];
+  name.textContent = obj.data["name"];
+  username.textContent = obj.data["login"];
+  location.textContent = obj.data["location"];
+  address.href = obj.data["html_url"]
+  followers.textContent = `Followers: ${obj.data["followers"]}`;
+  following.textContent = `Following: ${obj.data["following"]}`;
+  userBio.textContent = obj.data["bio"];
+
   card.append(image, cardInfo);
   cardInfo.append(name, username, location, profile, followers, following, userBio);
   profile.append(address);
-  
+
   return card;
 }
+// const data = gitHubData()
 /*
   List of LS Instructors Github username's:
     tetondan
